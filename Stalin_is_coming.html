@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stalin is coming...</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 2px solid #333;
+            background-color: black;
+        }
+    </style>
+<link rel="icon" type="image/png"
+          href="https://cdn.phototourl.com/free/2026-07-10-1f10d9e9-3509-410d-b691-36464e09f6c0.png">
+</head>
+<body>
+
+<canvas id="gameCanvas" width="1280" height="700"></canvas>
+
+<script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // ===== GAME VARIABLES =====
+let bestTime = 0;
+    let lookingBack = false;
+    let indevtools = false;
+    let miniScale = 10;
+    let miniSize = 120;
+    let stopwatchSeconds = 0;
+    let stopwatchRunning = false;
+    let runnable = false;
+    let gameOver = false;
+    let deathSequence = false;
+
+    // ===== MAP =====
+    const map = [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1],
+        [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+        [1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+        [1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        [1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+        [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1],
+        [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+        [1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    ];
+    const mapW = 20;
+    const mapH = 20;
+
+    // ===== PLAYER =====
+    let px = 3.5;
+    let py = 3.5;
+    let angle = 0;
+    const moveSpeed = 0.05;
+    const rotSpeed = 0.04;
+
+    // ===== ENEMY =====
+    let ex = 10.5;
+    let ey = 10.5;
+    let targetX = 10.5;
+    let targetY = 10.5;
+
+    // ===== AUDIO SYSTEM =====
+    const music = new Audio("https://mp3tourl.com/audio/1784039116659-560fc262-f9e5-4341-8a28-b95cbe03388e.wav");
+    music.loop = true;
+    music.volume = 0.2;
+    let audioUnlocked = false;
+
+    // Enemy image setup
+    const enemyImg = new Image();
+    enemyImg.src = "https://cdn.phototourl.com/free/2026-07-10-e714ef6a-a07c-4f87-b5aa-d6abb3a518c0.png";
+    let imageLoaded = false;
+    enemyImg.onload = () => { imageLoaded = true; };
+
+    // ===== INPUT =====
+    let keys = { w: false, a: false, s: false, d: false, Space: false };
+
+    // Initialize Game Loops
+    window.onload = () => {
+        setInterval(updateGame, 16);
+        setInterval(updateStopwatch, 1000);
+    };
+
+    function updateGame() {
+        if (!runnable) {
+            if (keys.w || keys.a || keys.s || keys.d) {
+                stopwatchRunning = true;
+                runnable = true;
+            } else {
+                stopwatchRunning = false;
+                render();
+                return;
+            }
+        }
+
+        if (!deathSequence) {
+            movePlayer();
+            
+      }
+        updateEnemy();
+        updateMusicVolume();
+        render();
+    }
+
+    function updateStopwatch() {
+        if (stopwatchRunning && !gameOver) {
+            stopwatchSeconds += 1;
+        }
+    }
+
+    // ===== PLAYER MOVEMENT =====
+    function movePlayer() {
+        let dx = Math.cos(angle);
+        let dy = Math.sin(angle);
+
+        if (keys.w) {
+            let nextY = Math.floor(py + dy * moveSpeed);
+            let nextX = Math.floor(px + dx * moveSpeed);
+            if (map[nextY] && map[nextY][nextX] === 0) {
+                px += dx * moveSpeed;
+                py += dy * moveSpeed;
+            }
+        }
+        if (keys.s) {
+            let nextY = Math.floor(py - dy * moveSpeed);
+            let nextX = Math.floor(px - dx * moveSpeed);
+            if (map[nextY] && map[nextY][nextX] === 0) {
+                px -= dx * moveSpeed;
+                py -= dy * moveSpeed;
+            }
+        }
+        if (keys.a) angle -= rotSpeed;
+        if (keys.d) angle += rotSpeed;
+    }
+
+    // ===== ENEMY PATHFINDING (BFS) =====
+    function findNextStep(sx, sy, tx, ty) {
+        if (gameOver) return { x: sx, y: sy };
+        if (sx === tx && sy === ty) return { x: sx, y: sy };
+
+        let visited = Array.from({ length: 20 }, () => Array(20).fill(false));
+        let parentX = Array.from({ length: 20 }, () => Array(20).fill(0));
+        let parentY = Array.from({ length: 20 }, () => Array(20).fill(0));
+
+        let queue = [];
+        queue.push({ x: sx, y: sy });
+        visited[sy][sx] = true;
+
+        const dirs = [
+            [1, 0], [-1, 0], [0, 1], [0, -1]
+        ];
+
+        while (queue.length > 0) {
+            let cur = queue.shift();
+
+            if (cur.x === tx && cur.y === ty) {
+                let cx = cur.x;
+                let cy = cur.y;
+
+                while (!(parentX[cy][cx] === sx && parentY[cy][cx] === sy)) {
+                    let px2 = parentX[cy][cx];
+                    let py2 = parentY[cy][cx];
+                    cx = px2;
+                    cy = py2;
+                }
+                return { x: cx, y: cy };
+            }
+
+            for (let i = 0; i < 4; i++) {
+                let nx = cur.x + dirs[i][0];
+                let ny = cur.y + dirs[i][1];
+
+                if (nx >= 0 && ny >= 0 && nx < mapW && ny < mapH) {
+                    if (!visited[ny][nx] && map[ny][nx] === 0) {
+                        visited[ny][nx] = true;
+                        queue.push({ x: nx, y: ny });
+                        parentX[ny][nx] = cur.x;
+                        parentY[ny][nx] = cur.y;
+                    }
+                }
+            }
+        }
+        return { x: sx, y: sy };
+    }
+
+    // ===== ENEMY UPDATE =====
+    function updateEnemy() {
+        if (gameOver) return;
+
+        // Check if player is caught
+        let pDist = Math.sqrt((px - ex) ** 2 + (py - ey) ** 2);
+        if (pDist < 1.0) {
+let deathTime = 0;
+stopwatchRunning = false;
+            startDeathSequence();
+            indevtools = false;
+            
+            // Move slowly towards the player during death sequence
+            let dx = px - ex;
+            let dy = py - ey;
+            let len = Math.sqrt(dx * dx + dy * dy) || 1;
+            ex += (dx / len) * 0.01;
+            ey += (dy / len) * 0.01;
+            return;
+        }
+
+        // If Stalin has reached his current tile target, look for the next grid step
+        let tDist = Math.sqrt((targetX - ex) ** 2 + (targetY - ey) ** 2);
+        if (tDist < 0.1) {
+            let sx = Math.floor(ex);
+            let sy = Math.floor(ey);
+            let tx = Math.floor(px);
+            let ty = Math.floor(py);
+
+            let nextTile = findNextStep(sx, sy, tx, ty);
+            // Center target into the middle of the tile space (.5) to match coordinate alignment
+            targetX = nextTile.x + 0.5;
+            targetY = nextTile.y + 0.5;
+        }
+
+        // Calculate accurate movement physics vector
+        let vecX = targetX - ex;
+        let vecY = targetY - ey;
+        let len = Math.sqrt(vecX * vecX + vecY * vecY);
+
+        if (len > 0.01) {
+        
+            let speed = (enemyDistance() < 10) ? 0.050 : 0.040 ;  //0.085 : 0.08;
+            ex += (vecX / len) * speed;
+            ey += (vecY / len) * speed;
+        }
+    }
+
+    function startDeathSequence() {
+
+deathTime = stopwatchSeconds;
+
+        if (deathSequence) return;
+        deathSequence = true;
+
+
+if (deathTime > bestTime) {
+    bestTime = deathTime;
+}        keys.w = keys.s = keys.a = keys.d = false;
+        lookingBack = false;
+
+        angle = Math.atan2(ey - py, ex - px);
+
+        setTimeout(() => {
+            gameOver = true;
+        }, 1500);
+    }
+
+    function enemyDistance() {
+        let dx = ex - px;
+        let dy = ey - py;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function updateMusicVolume() {
+        if (!audioUnlocked) return;
+
+        let dist = enemyDistance();
+        let hearingDistance = 8.0;
+        let vol = 0;
+
+        if (dist <= hearingDistance) {
+            let t = dist / hearingDistance;
+            vol = (1.0 - t);
+        }
+        
+        if (gameOver) {
+            music.volume = 1.0;
+        } else {
+            music.volume = Math.min(1.0, Math.max(0, vol));
+        }
+    }
+
+    // ===== RENDER ENGINE =====
+    function render() {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        let width = canvas.width;
+        let height = canvas.height;
+        let depthBuffer = new Array(width).fill(20);
+        let renderAngle = angle;
+
+        let hours = String(Math.floor(stopwatchSeconds / 3600)).padStart(2, '0');
+        let minutes = String(Math.floor((stopwatchSeconds % 3600) / 60)).padStart(2, '0');
+        let secs = String(stopwatchSeconds % 60).padStart(2, '0');
+
+
+        let timeText = `Time: ${hours}:${minutes}:${secs}`;
+let bestHours = String(Math.floor(bestTime / 3600)).padStart(2, '0');
+let bestMinutes = String(Math.floor((bestTime % 3600) / 60)).padStart(2, '0');
+let bestSecs = String(bestTime % 60).padStart(2, '0');
+
+        if (lookingBack) {
+            renderAngle += Math.PI;
+        }
+
+        // Raycasting Loop
+        for (let x = 0; x < width; x += 2) {
+            let cameraX = (2.0 * x / width) - 1;
+            let rayAngle = renderAngle + cameraX * 0.9;
+
+            let rayDirX = Math.cos(rayAngle);
+            let rayDirY = Math.sin(rayAngle);
+
+            let dist = 0;
+            let hit = false;
+
+            while (!hit && dist < 20) {
+                dist += 0.02;
+
+                let testX = Math.floor(px + rayDirX * dist);
+                let testY = Math.floor(py + rayDirY * dist);
+
+                if (testX < 0 || testX >= mapW || testY < 0 || testY >= mapH) {
+                    hit = true;
+                    dist = 20;
+                } else if (map[testY][testX] === 1) {
+                    hit = true;
+                }
+            }
+
+            let correctedDist = dist * Math.cos(rayAngle - renderAngle);
+            depthBuffer[x] = correctedDist;
+            let lineHeight = Math.floor(height / (correctedDist + 0.0001));
+
+            let shade = Math.floor(255 / (1 + correctedDist * 0.12));
+            shade = Math.max(0, Math.min(255, shade));
+            let fog = Math.floor(correctedDist * 12);
+
+            let colorVal = Math.max(0, shade - fog);
+            ctx.fillStyle = `rgb(${colorVal},${colorVal},${colorVal})`;
+            ctx.fillRect(x, (height / 2) - (lineHeight / 2), 3, lineHeight);
+        }
+
+        // Sprite Rendering Logic
+        if (!gameOver) {
+            let relX = ex - px;
+            let relY = ey - py;
+            let dist = Math.sqrt(relX * relX + relY * relY);
+            if (dist < 0.2) dist = 0.2;
+            if (dist > 20) dist = 20;
+
+            let ang = Math.atan2(relY, relX) - renderAngle;
+            while (ang < -Math.PI) ang += 2 * Math.PI;
+            while (ang > Math.PI) ang -= 2 * Math.PI;
+
+            if (Math.abs(ang) < 0.6 && canSeeEnemy()) {
+                let screenX = Math.floor((ang / 0.6 + 1) * (width / 2));
+                let sizer = Math.floor(height / (dist + 0.5));
+
+                if (sizer < 2) sizer = 2;
+                if (sizer > height) sizer = height;
+                let screenY = (height / 2) - (sizer / 2);
+
+                let brightness = Math.exp(-dist * 0.18);
+                if (brightness < 0.1) brightness = 0.1;
+
+                if (screenX >= 0 && screenX < width) {
+                    let bufferX = screenX - (screenX % 2);
+                    if (dist < depthBuffer[bufferX]) {
+                        ctx.globalAlpha = brightness;
+                        if (imageLoaded) {
+                            ctx.drawImage(enemyImg, screenX - (sizer / 2), screenY, sizer, sizer);
+                        } else {
+                            ctx.fillStyle = "red";
+                            ctx.fillRect(screenX - (sizer / 2), screenY, sizer, sizer);
+                        }
+                        ctx.globalAlpha = 1.0;
+                    }
+                }
+            }
+        } else {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.fillStyle = "red";
+            ctx.font = "bold 35px Arial"; ////////////////////////////////////////////dildo = yum
+            ctx.textAlign = "center";
+            ctx.fillText("You were slain by The Союз Советских Социалистических Республик", width / 2, height / 2 - 20);
+            ctx.fillText(`Your record time (${hours}:${minutes}:${secs})`, width / 2, height / 2 + 30);
+            ctx.fillText(`Highest time: ${bestHours}:${bestMinutes}:${bestSecs}`, width / 2, height / 2 + 80);
+            return;
+        }
+
+        // Minimap Render
+        if (indevtools) {
+            drawMiniMap();
+        }
+
+        // Clock Render
+        if (!deathSequence) {
+            ctx.fillStyle = "darkorange";
+            ctx.font = "bold 40px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(timeText, width / 2, height - 30);
+        }
+
+        // UI Indicators
+        if (indevtools) {
+            ctx.fillStyle = "red";
+            ctx.font = "bold 30px Arial";
+            ctx.textAlign = "right";
+            ctx.fillText(`Distance to Stalin: ${enemyDistance().toFixed(2)}m`, width - 10, 40);
+        }
+
+        // Screen Proximity Red Overlay Effects
+        if (!gameOver) {
+            let dist3 = enemyDistance();
+            let maxDist = 10.0;
+            let t = 1.0 - Math.min(dist3 / maxDist, 1.0);
+            t = Math.pow(t, 2.0);
+            let alpha = t * 0.6;
+
+            ctx.fillStyle = `rgba(255, 0, 0, ${alpha})`;
+            ctx.fillRect(0, 0, width, height);
+        }
+    }
+
+    function canSeeEnemy() {
+        let dx = ex - px;
+        let dy = ey - py;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        let steps = Math.floor(dist * 10);
+
+        if (steps <= 0) return true;
+
+        for (let i = 0; i <= steps; i++) {
+            let t = i / steps;
+            let cx = px + dx * t;
+            let cy = py + dy * t;
+
+            if (cx >= 0 && cy >= 0 && cx < mapW && cy < mapH) {
+                if (map[Math.floor(cy)][Math.floor(cx)] === 1) return false;
+            }
+        }
+        return true;
+    }
+function resetGame() {
+    // Player
+    px = 3.5;
+    py = 3.5;
+    angle = 0;
+
+    // Enemy
+    ex = 10.5;
+    ey = 10.5;
+    targetX = 10.5;
+    targetY = 10.5;
+
+    // Game state
+    lookingBack = false;
+    runnable = false;
+    gameOver = false;
+    deathSequence = false;
+    stopwatchSeconds = 0;
+    stopwatchRunning = false;
+
+    // Reset keys
+    keys.w = false;
+    keys.a = false;
+    keys.s = false;
+    keys.d = false;
+    keys.Space = false;
+
+    // Reset music
+    music.volume = 0;
+}
+
+
+    function drawMiniMap() {
+        ctx.save();
+        ctx.translate(10, 10);
+        for (let y = 0; y < mapH; y++) {
+            for (let x = 0; x < mapW; x++) {
+                ctx.fillStyle = map[y][x] === 1 ? "darkgray" : "black";
+                ctx.fillRect(x * miniScale, y * miniScale, miniScale, miniScale);
+            }
+        }
+
+        // Player (Blue)
+        ctx.fillStyle = "blue";
+        ctx.beginPath();
+        ctx.arc((px * miniScale), (py * miniScale) + 3, 4, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Enemy (Red)
+        ctx.fillStyle = "red";
+        ctx.beginPath();
+        ctx.arc((ex * miniScale), (ey * miniScale) + 3, 4, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Border Rect
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(0, 0, mapW * miniScale, mapH * miniScale);
+        ctx.restore();
+    }
+
+    // ===== INPUT MATRIX SYSTEM =====
+    window.addEventListener("keydown", (e) => {
+        if (!audioUnlocked) {
+            music.play().then(() => {
+                audioUnlocked = true;
+            }).catch(err => console.log("Audio waiting on interaction:", err));
+        }
+
+        if (!deathSequence && !gameOver) {
+            if (e.code === "Space") lookingBack = true;
+        }
+        if (e.code === "KeyE") indevtools = !indevtools;
+
+        if (!gameOver) {
+            if (e.code === "KeyW") keys.w = true;
+            if (e.code === "KeyS") keys.s = true;
+            if (e.code === "KeyA") keys.a = true;
+            if (e.code === "KeyD") keys.d = true;
+        }
+        
+        if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.code)) {
+            e.preventDefault();
+        }
+    });
+
+    window.addEventListener("keyup", (e) => {
+        if (e.code === "Space") lookingBack = false;
+        if (e.code === "KeyW") keys.w = false;
+        if (e.code === "KeyS") keys.s = false;
+        if (e.code === "KeyA") keys.a = false;
+        if (e.code === "KeyD") keys.d = false;
+    });canvas.addEventListener("click", () => {
+    if (gameOver) {
+        resetGame();
+    }
+});
+
+</script>
+
+</body>
+</html>
