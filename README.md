@@ -20,6 +20,7 @@ press SPACE to look backwards (doesn't start the game as a trigger like w,a,s,d)
 left click on mouse to restart if you reached the game over screen
 
 [GOAL OF GAME]
+
 Once the game starts, Stalin will constant chase you until it reaches you in a kill range and kills
 your goal is to survive as long as you can without being caught by Stalin
 
