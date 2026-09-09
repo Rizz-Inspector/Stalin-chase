@@ -21,7 +21,7 @@ d to turn right
 *note that the game will not start until you press any of w,a,s,d
 
 
-press SPACE to look backwards (doesn't start the game as a trigger like w,a,s,d)
+hold SPACE to look backwards (doesn't start the game as a trigger like w,a,s,d)
 left click on mouse to restart if you reached the game over screen
 
 [GOAL OF THE GAME]
