@@ -4,4 +4,4 @@ https://rizz-inspector.github.io/Stalin-chase/
 
 note:
 -this game can be accessed even through school servers, so please enjoy this ogunblocked game
--this is a game made using 40% of ai and 60% human effort, all rights reserved by Rizz Inspector
+-this is a game made using 20% of ai and 80% human effort, all rights reserved by Rizz Inspector
