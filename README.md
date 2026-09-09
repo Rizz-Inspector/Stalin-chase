@@ -9,6 +9,8 @@ https://rizz-inspector.github.io/Stalin-chase/
 
 [GAME INSTRUCTIONS]
 
+(IM SO SORRY IF YOU'RE PLAYING THIS ON PHONES BUT THIS GAME IS ONLY PC FRIENDLY)
+
 w to move forward
 
 a to turn left
