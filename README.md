@@ -1,6 +1,6 @@
 <<<CAUNTION: VOLUME WARNING>>>
 
-<<if you don't want your ears to snap, turn your volume to a minimum but not muted unless you want to get hearing loss >>
+<if you don't want your ears to snap, turn your volume to a minimum but not muted unless you want to get hearing loss>
 
 In order to play the game, please access website via this link below
 
