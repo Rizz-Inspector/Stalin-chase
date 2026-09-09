@@ -47,7 +47,7 @@ intended to be a prototype of testing ai's performance along with rendering phys
 -press e to enable and disable statistic tablet which includes a map that locates you and Stalin's position along with a distance from Stalin display
 (try not to use the statistic tablet because it kinda counts as a cheat)
 
-Disclaimer: this game is built for entertaining purposes but not as a reminder of history's failure, 
+[Disclaimer]: this game is built for entertaining purposes but not as a reminder of history's failure, 
 if you are offended by the content of this game, please do not play. We are not responsible for your 
 own decision and your own opinions. 
 
