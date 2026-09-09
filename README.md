@@ -1,4 +1,4 @@
-In order to use the game, please access website via this link below
+In order to play the game, please access website via this link below
 
 https://rizz-inspector.github.io/Stalin-chase/
 
