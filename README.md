@@ -1,3 +1,7 @@
+<<<CAUNTION: VOLUME WARNING>>>
+
+<<if you don't want your ears to snap, turn your volume to a minimum but not muted unless you want to get hearing loss >>
+
 In order to play the game, please access website via this link below
 
 https://rizz-inspector.github.io/Stalin-chase/
@@ -21,8 +25,11 @@ left click on mouse to restart if you reached the game over screen
 
 [GOAL OF THE GAME]
 
-Once the game starts, Stalin will constant chase you until it reaches you in a kill range and kills
-your goal is to survive as long as you can without being caught by Stalin
+Once the game starts in a world of corridors, Stalin will constant chase you until it reaches you in a 
+kill range and kills you. Your goal is to survive as long as you can without being caught by Stalin and beat your own record 
+(try to versus your friends and see who can hold the highest record by beating one and another's time record).
+As Stalin gets closer to you, atmosphere intensifies along with the uprise of the great Soviet Anthem (1984) heard 
+through the corridors in the game, leveling up the anxiety and fear that is evoked from Stalin. Have fun with him!
 
 
 extra notes:
