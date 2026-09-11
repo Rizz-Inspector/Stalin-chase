@@ -42,7 +42,7 @@ through the corridors in the game, leveling up the anxiety and fear that is evok
 -this is a game made using 10% of ai and 90% human effort, all rights reserved by Rizz Inspector
 
 -the quality of this game is questionable, which it is due to this game is originally 
-intended to be a prototype of testing ai's performance along with rendering physics
+intended to be an experiment of testing ai's performance along with rendering physics
 
 -press e to enable and disable statistic tablet which includes a map that locates you and Stalin's position along with a distance from Stalin display
 (try not to use the statistic tablet because it kinda counts as a cheat)
